@@ -1,26 +1,53 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useMaintenance } from '@/hooks/useMaintenance';
 
 export default function AdminDashboard() {
-  const { user, logout, isLoading } = useAuth();
-  const { isMaintenanceMode, setMaintenanceMode } = useMaintenance();
+  const { user, logout, isLoading: authLoading } = useAuth();
+  const { isMaintenanceMode, setMaintenanceMode, isLoading: maintLoading } = useMaintenance();
   const router = useRouter();
+  
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(true);
 
+  // Redirección de seguridad
   useEffect(() => {
-    if (!isLoading) {
+    if (!authLoading) {
       if (!user) {
         router.push('/login');
       } else if (user.role !== 'ADMIN') {
         router.push('/ciudadano');
       }
     }
-  }, [user, isLoading, router]);
+  }, [user, authLoading, router]);
 
-  if (isLoading || !user) return null;
+  // Cargar Logs periódicamente
+  useEffect(() => {
+    if (!user || user.role !== 'ADMIN') return;
+
+    const fetchLogs = async () => {
+      try {
+        const response = await fetch('/api/logs');
+        const data = await response.json();
+        if (data.success && data.logs) {
+          setLogs(data.logs);
+        }
+      } catch (error) {
+        console.error("Error al obtener logs", error);
+      } finally {
+        setLoadingLogs(false);
+      }
+    };
+
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 10000); // Polling cada 10 segs
+    return () => clearInterval(interval);
+  }, [user]);
+
+  if (authLoading || !user) return null;
 
   return (
     <section id="dashboard-view" className="view active" aria-live="polite">
@@ -49,35 +76,51 @@ export default function AdminDashboard() {
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Al activar, los ciudadanos verán una pantalla de mantenimiento y no podrán acceder a sus beneficios.</p>
             </div>
             <button 
-              onClick={() => setMaintenanceMode(!isMaintenanceMode)}
+              onClick={() => setMaintenanceMode(!isMaintenanceMode, user.name)}
+              disabled={maintLoading}
               style={{
                 padding: '10px 20px',
                 borderRadius: '8px',
                 fontWeight: 600,
                 border: 'none',
-                cursor: 'pointer',
+                cursor: maintLoading ? 'wait' : 'pointer',
                 background: isMaintenanceMode ? '#dc2626' : '#16a34a',
                 color: 'white',
-                transition: 'background 0.2s'
+                transition: 'background 0.2s',
+                opacity: maintLoading ? 0.7 : 1
               }}
             >
-              {isMaintenanceMode ? 'Desactivar Mantenimiento' : 'Activar Mantenimiento'}
+              {maintLoading ? 'Cambiando...' : (isMaintenanceMode ? 'Desactivar Mantenimiento' : 'Activar Mantenimiento')}
             </button>
           </div>
         </div>
 
         <div style={{ marginTop: '40px', padding: '40px', background: 'var(--card-glass)', borderRadius: 'var(--radius-lg)' }}>
-          <h3 style={{ marginBottom: '16px', color: 'var(--primary)' }}>Registros de Errores (Logs)</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ color: 'var(--primary)', margin: 0 }}>Registros de Errores (Logs en vivo)</h3>
+            {loadingLogs && <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Actualizando...</span>}
+          </div>
           <div style={{ background: '#1e293b', borderRadius: '8px', padding: '20px', overflowX: 'auto', color: '#e2e8f0', fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.6', maxHeight: '300px', overflowY: 'auto' }}>
-            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 10:23:41] Connection timeout at /api/benefits - Retrying...</div>
-            <div style={{ color: '#eab308' }}>[WARN]  [2024-05-12 10:24:05] High memory usage detected on worker #4</div>
-            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 11:05:12] Failed to fetch external API: libreapi.cl</div>
-            <div style={{ color: '#22c55e' }}>[INFO]  [2024-05-12 11:10:00] Maintenance mode deactivated by Admin (Tomas)</div>
-            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 11:45:22] Missing required parameter 'rut' in request body</div>
-            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 12:01:09] Database query took longer than 5000ms</div>
-            <div style={{ color: '#eab308' }}>[WARN]  [2024-05-12 12:30:15] Rate limit exceeded for IP 190.168.1.1</div>
-            <div style={{ color: '#22c55e' }}>[INFO]  [2024-05-12 13:00:00] Daily backup completed successfully</div>
-            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 14:15:33] Unhandled Rejection: Cannot read properties of undefined (reading 'length')</div>
+            
+            {logs.length === 0 && !loadingLogs && (
+              <div style={{ color: '#94a3b8', fontStyle: 'italic' }}>No hay registros disponibles en la base de datos.</div>
+            )}
+            
+            {logs.map((log) => {
+              let color = '#e2e8f0';
+              if (log.type === 'ERROR') color = '#ef4444';
+              if (log.type === 'WARN') color = '#eab308';
+              if (log.type === 'INFO') color = '#22c55e';
+              
+              const dateObj = new Date(log.timestamp);
+              const formattedDate = dateObj.toLocaleString('es-CL');
+
+              return (
+                <div key={log.id} style={{ color, marginBottom: '4px' }}>
+                  [{log.type}] [{formattedDate}] {log.message}
+                </div>
+              );
+            })}
           </div>
         </div>
       </main>
