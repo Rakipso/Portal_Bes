@@ -20,9 +20,12 @@ export function formatRUT(rut: string): string {
  * Retorna true si es válido, false en caso contrario.
  */
 export function validateRUT(rutCompleto: string): boolean {
-  if (!/^[0-9]+-[0-9kK]{1}$/.test(rutCompleto)) return false;
+  // Remover puntos para la validación
+  const cleanRut = rutCompleto.replace(/\./g, '');
   
-  const parts = rutCompleto.split('-');
+  if (!/^[0-9]+-[0-9kK]{1}$/.test(cleanRut)) return false;
+  
+  const parts = cleanRut.split('-');
   if (parts.length !== 2) return false;
   
   let rut = parseInt(parts[0], 10);
