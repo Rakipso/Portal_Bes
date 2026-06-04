@@ -2,11 +2,13 @@
 
 import React from 'react';
 import { useMaintenance } from '@/hooks/useMaintenance';
+import { useAuth } from '@/hooks/useAuth';
 
 export function MaintenanceWrapper({ children }: { children: React.ReactNode }) {
   const { isMaintenanceMode } = useMaintenance();
+  const { user } = useAuth();
 
-  if (isMaintenanceMode) {
+  if (isMaintenanceMode && user?.role !== 'ADMIN') {
     return (
       <section id="maintenance-view" className="view active" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', textAlign: 'center', padding: '20px' }}>
         <div style={{ maxWidth: '600px', padding: '40px', background: 'rgba(255,255,255,0.9)', borderRadius: '16px', boxShadow: 'var(--shadow-lg)' }}>

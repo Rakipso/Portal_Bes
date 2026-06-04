@@ -65,6 +65,21 @@ export default function AdminDashboard() {
             </button>
           </div>
         </div>
+
+        <div style={{ marginTop: '40px', padding: '40px', background: 'var(--card-glass)', borderRadius: 'var(--radius-lg)' }}>
+          <h3 style={{ marginBottom: '16px', color: 'var(--primary)' }}>Registros de Errores (Logs)</h3>
+          <div style={{ background: '#1e293b', borderRadius: '8px', padding: '20px', overflowX: 'auto', color: '#e2e8f0', fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.6', maxHeight: '300px', overflowY: 'auto' }}>
+            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 10:23:41] Connection timeout at /api/benefits - Retrying...</div>
+            <div style={{ color: '#eab308' }}>[WARN]  [2024-05-12 10:24:05] High memory usage detected on worker #4</div>
+            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 11:05:12] Failed to fetch external API: libreapi.cl</div>
+            <div style={{ color: '#22c55e' }}>[INFO]  [2024-05-12 11:10:00] Maintenance mode deactivated by Admin (Tomas)</div>
+            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 11:45:22] Missing required parameter 'rut' in request body</div>
+            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 12:01:09] Database query took longer than 5000ms</div>
+            <div style={{ color: '#eab308' }}>[WARN]  [2024-05-12 12:30:15] Rate limit exceeded for IP 190.168.1.1</div>
+            <div style={{ color: '#22c55e' }}>[INFO]  [2024-05-12 13:00:00] Daily backup completed successfully</div>
+            <div style={{ color: '#ef4444' }}>[ERROR] [2024-05-12 14:15:33] Unhandled Rejection: Cannot read properties of undefined (reading 'length')</div>
+          </div>
+        </div>
       </main>
     </section>
   );
