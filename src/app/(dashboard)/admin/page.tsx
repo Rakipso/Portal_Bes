@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useMaintenance } from '@/hooks/useMaintenance';
+import { MockAPI } from '@/services/api';
 
 export default function AdminDashboard() {
   const { user, logout, isLoading: authLoading } = useAuth();
@@ -30,11 +31,8 @@ export default function AdminDashboard() {
 
     const fetchLogs = async () => {
       try {
-        const response = await fetch('/api/logs');
-        const data = await response.json();
-        if (data.success && data.logs) {
-          setLogs(data.logs);
-        }
+        const data = await MockAPI.getLogs();
+        setLogs(data);
       } catch (error) {
         console.error("Error al obtener logs", error);
       } finally {
@@ -43,8 +41,16 @@ export default function AdminDashboard() {
     };
 
     fetchLogs();
+    
+    // Escuchar el evento personalizado emitido por MockAPI
+    const handleMaintenanceChange = () => fetchLogs();
+    window.addEventListener('maintenance_changed', handleMaintenanceChange);
+    
     const interval = setInterval(fetchLogs, 10000); // Polling cada 10 segs
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('maintenance_changed', handleMaintenanceChange);
+    };
   }, [user]);
 
   if (authLoading || !user) return null;

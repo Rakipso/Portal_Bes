@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { MockAPI } from '@/services/api';
 
 interface MaintenanceContextType {
   isMaintenanceMode: boolean;
@@ -14,26 +15,31 @@ export function MaintenanceProvider({ children }: { children: React.ReactNode })
   const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Cargar estado inicial desde el backend
+  const fetchMaintenanceStatus = async () => {
+    try {
+      const status = await MockAPI.getMaintenanceStatus();
+      setIsMaintenanceMode(status);
+    } catch (error) {
+      console.error("Error al obtener estado de mantenimiento", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cargar estado inicial desde el Mock Service
   useEffect(() => {
-    const fetchMaintenanceStatus = async () => {
-      try {
-        const response = await fetch('/api/maintenance');
-        const data = await response.json();
-        if (data.success) {
-          setIsMaintenanceMode(data.isMaintenance);
-        }
-      } catch (error) {
-        console.error("Error al obtener estado de mantenimiento", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchMaintenanceStatus();
     
-    // Polling cada 30 segundos para revisar si alguien más activó el mantenimiento
-    const interval = setInterval(fetchMaintenanceStatus, 30000);
-    return () => clearInterval(interval);
+    // Escuchar el evento personalizado emitido por MockAPI para sincronizar al instante
+    const handleMaintenanceChange = () => fetchMaintenanceStatus();
+    window.addEventListener('maintenance_changed', handleMaintenanceChange);
+    
+    // Polling cada 10 segundos por seguridad (para multi-ventanas)
+    const interval = setInterval(fetchMaintenanceStatus, 10000);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('maintenance_changed', handleMaintenanceChange);
+    };
   }, []);
 
   const setMaintenanceMode = async (status: boolean, adminName?: string) => {
@@ -41,18 +47,9 @@ export function MaintenanceProvider({ children }: { children: React.ReactNode })
     setIsMaintenanceMode(status);
     
     try {
-      const response = await fetch('/api/maintenance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isMaintenance: status, adminName })
-      });
-      const data = await response.json();
-      if (!data.success) {
-        // Revertir en caso de error
-        setIsMaintenanceMode(!status);
-      }
+      await MockAPI.toggleMaintenance(status, adminName);
     } catch (error) {
-      console.error("Fallo de red al intentar cambiar el mantenimiento", error);
+      console.error("Fallo simulado al intentar cambiar el mantenimiento", error);
       setIsMaintenanceMode(!status); // Revertir
     }
   };
