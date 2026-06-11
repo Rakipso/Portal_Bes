@@ -15,8 +15,6 @@ export default function CiudadanoDashboard() {
     if (!isLoading) {
       if (!user) {
         router.push('/login');
-      } else if (user.role === 'ADMIN') {
-        router.push('/admin');
       }
     }
   }, [user, isLoading, router]);
@@ -36,6 +34,25 @@ export default function CiudadanoDashboard() {
           <span id="user-name-display" style={{ fontWeight: 700, color: '#0F4C81' }}>{user.name}</span>
           {/* Display masked RUT - in a real app this would come from the auth token */}
           <span id="user-rut-display" style={{ color: 'var(--text-secondary)' }}>12.345.***-*</span>
+          
+          {user.role === 'ADMIN' && (
+            <button 
+              onClick={() => router.push('/admin')}
+              style={{
+                marginLeft: '10px',
+                padding: '6px 12px',
+                background: '#0F4C81',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Ir al Panel de Auditoría
+            </button>
+          )}
+
           <button id="logout-btn" className="btn-logout" onClick={logout}>Cerrar Sesión</button>
         </div>
       </nav>

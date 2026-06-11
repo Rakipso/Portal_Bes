@@ -37,4 +37,5 @@ export interface IBenefit {
   reasons: RecordResponses;
   successes: RecordResponses;
   manualReqs?: string[];
+  linkStatus?: 'active' | 'down';
 }

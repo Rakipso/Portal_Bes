@@ -26,7 +26,7 @@ export function useBenefits(user: IUser | null) {
       const successes: string[] = [];
       const req = benefit.reqs;
 
-      const isOffline = offlineInstitutions.includes(benefit.institution);
+      const isOffline = benefit.linkStatus === 'down' || offlineInstitutions.includes(benefit.institution);
 
       // Evaluación de Género
       if (req.gender) {

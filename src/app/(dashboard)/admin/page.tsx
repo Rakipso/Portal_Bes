@@ -64,6 +64,23 @@ export default function AdminDashboard() {
         </div>
         <div className="nav-user">
           <span id="user-name-display" style={{ fontWeight: 700, color: '#0F4C81' }}>{user.name}</span>
+          
+          <button 
+            onClick={() => router.push('/ciudadano')}
+            style={{
+              marginLeft: '10px',
+              padding: '6px 12px',
+              background: '#e2e8f0',
+              color: '#0F4C81',
+              border: '1px solid #cbd5e1',
+              borderRadius: '4px',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Ver Mis Beneficios
+          </button>
+
           <button id="logout-btn" className="btn-logout" onClick={logout}>Cerrar Sesión</button>
         </div>
       </nav>

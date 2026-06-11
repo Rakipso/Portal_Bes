@@ -32,7 +32,8 @@ export const benefitsData: IBenefit[] = [
         url: "https://sence.gob.cl/personas/btm",
         reqs: { gender: "F" },
         reasons: { gender: "Beneficio exclusivo para mujeres." },
-        successes: { gender: "Cumples con el requisito de ser mujer." }
+        successes: { gender: "Cumples con el requisito de ser mujer." },
+        linkStatus: 'down'
     },
     {
         id: 4,
