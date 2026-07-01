@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { IBenefit, IUser } from '@/lib/types';
-import { allBenefits as fallbackBenefits } from '@/lib/constants';
+import { benefitsData as fallbackBenefits } from '@/lib/constants';
 
 export interface EvaluatedBenefit {
   benefit: IBenefit;

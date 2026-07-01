@@ -1,6 +1,6 @@
 import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
-import { allBenefits } from '@/lib/constants';
+import { benefitsData as allBenefits } from '@/lib/constants';
 
 // Forzar actualización dinámica, evitar caché estático
 export const dynamic = 'force-dynamic';
