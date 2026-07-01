@@ -22,7 +22,7 @@ export function BenefitsManager() {
     }
   };
 
-  const handleUpdate = async (id: number, url: string, linkStatus: 'up' | 'down') => {
+  const handleUpdate = async (id: number, url: string, linkStatus: 'active' | 'down') => {
     setSavingId(id);
     try {
       const res = await fetch('/api/benefits', {
@@ -67,7 +67,7 @@ export function BenefitsManager() {
                 defaultValue={benefit.url}
                 onBlur={(e) => {
                   if (e.target.value !== benefit.url) {
-                    handleUpdate(benefit.id, e.target.value, benefit.linkStatus || 'up');
+                    handleUpdate(benefit.id, e.target.value, benefit.linkStatus || 'active');
                   }
                 }}
                 disabled={savingId === benefit.id}
@@ -76,8 +76,8 @@ export function BenefitsManager() {
               />
               
               <select
-                value={benefit.linkStatus || 'up'}
-                onChange={(e) => handleUpdate(benefit.id, benefit.url, e.target.value as 'up' | 'down')}
+                value={benefit.linkStatus || 'active'}
+                onChange={(e) => handleUpdate(benefit.id, benefit.url, e.target.value as 'active' | 'down')}
                 disabled={savingId === benefit.id}
                 style={{
                   padding: '8px',
@@ -89,7 +89,7 @@ export function BenefitsManager() {
                   cursor: 'pointer'
                 }}
               >
-                <option value="up">En línea (Activo)</option>
+                <option value="active">En línea (Activo)</option>
                 <option value="down">Caído (Inactivo)</option>
               </select>
 

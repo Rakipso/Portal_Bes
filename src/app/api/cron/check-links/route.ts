@@ -49,7 +49,7 @@ export async function GET(request: Request) {
           else if (response.ok && benefit.linkStatus === 'down') {
             console.log(`[CRON] Link recuperado: ${benefit.title}`);
             changedCount++;
-            return { ...benefit, linkStatus: 'up' };
+            return { ...benefit, linkStatus: 'active' };
           }
 
           return benefit;
