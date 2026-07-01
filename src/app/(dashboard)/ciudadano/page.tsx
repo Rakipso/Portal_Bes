@@ -19,9 +19,16 @@ export default function CiudadanoDashboard() {
     }
   }, [user, isLoading, router]);
 
-  const { eligible, pending, ineligible } = useBenefits(user);
+  const { eligible, pending, ineligible, isLoadingBenefits } = useBenefits(user);
 
   if (isLoading || !user) return null;
+  if (isLoadingBenefits) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#0F4C81' }}>
+        <h2>Cargando tus beneficios desde la base de datos...</h2>
+      </div>
+    );
+  }
 
   return (
     <section id="dashboard-view" className="view active" aria-live="polite">

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useMaintenance } from '@/hooks/useMaintenance';
 import { MockAPI } from '@/services/api';
+import { BenefitsManager } from '@/components/admin/BenefitsManager';
 
 export default function AdminDashboard() {
   const { user, logout, isLoading: authLoading } = useAuth();
@@ -146,6 +147,9 @@ export default function AdminDashboard() {
             })}
           </div>
         </div>
+
+        {/* Nuevo componente de gestión de beneficios dinámicos */}
+        <BenefitsManager />
       </main>
     </section>
   );

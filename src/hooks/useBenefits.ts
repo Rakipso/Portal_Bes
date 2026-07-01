@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { IBenefit, IUser } from '@/lib/types';
-import { benefitsData } from '@/lib/constants';
+import { allBenefits as fallbackBenefits } from '@/lib/constants';
 
 export interface EvaluatedBenefit {
   benefit: IBenefit;
@@ -11,6 +11,29 @@ export interface EvaluatedBenefit {
 }
 
 export function useBenefits(user: IUser | null) {
+  const [benefitsData, setBenefitsData] = useState<IBenefit[]>([]);
+  const [isLoadingBenefits, setIsLoadingBenefits] = useState(true);
+
+  useEffect(() => {
+    async function fetchBenefits() {
+      try {
+        const res = await fetch('/api/benefits');
+        if (res.ok) {
+          const data = await res.json();
+          setBenefitsData(data);
+        } else {
+          setBenefitsData(fallbackBenefits);
+        }
+      } catch (e) {
+        console.error('Failed to fetch benefits, using fallback', e);
+        setBenefitsData(fallbackBenefits);
+      } finally {
+        setIsLoadingBenefits(false);
+      }
+    }
+    fetchBenefits();
+  }, []);
+
   const evaluatedBenefits = useMemo(() => {
     if (!user) return { eligible: [], pending: [], ineligible: [] };
 
@@ -112,7 +135,7 @@ export function useBenefits(user: IUser | null) {
     });
 
     return { eligible, pending, ineligible };
-  }, [user]);
+  }, [user, benefitsData]);
 
-  return evaluatedBenefits;
+  return { ...evaluatedBenefits, isLoadingBenefits };
 }

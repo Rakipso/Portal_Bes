@@ -1,0 +1,14 @@
+EA3 Portal BES - Pack corregido v3
+
+Corrección aplicada:
+- Se mantienen las 8 historias de usuario originales.
+- Se agregan 4 historias nuevas, llegando a 12 HU.
+- Cada HU tiene 4 criterios de aceptación.
+- Se generan 48 casos de prueba: 1 caso por criterio.
+- Se actualizan PPT, plan de pruebas y Excel consolidado.
+
+Prototipo funcional:
+https://portal-bes.vercel.app/login
+
+Sobre la ejecución de pruebas:
+Las pruebas se ejecutan manualmente sobre el prototipo publicado. El Kanban sirve para seguimiento visual; no reemplaza la ejecución.
